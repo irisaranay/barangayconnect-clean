@@ -1,0 +1,13 @@
+<ion-content fullscreen class="ion-no-padding">
+  <!-- ✅ New animated wrapper -->
+  <div class="splash-animate-wrapper" [ngClass]="{ 'fade-out': isExiting }">
+    <div class="splash-wrapper">
+      <div class="logo-box" [ngClass]="{ 'expand': expandLogo }">
+        <img src="assets/logo.jpg" alt="Logo" />
+      </div>
+
+      <h1 class="app-title">BARANGAY CONNECT</h1>
+      <p class="app-subtitle"><em> Where requests meet results </em></p>
+    </div>
+  </div>
+</ion-content>
