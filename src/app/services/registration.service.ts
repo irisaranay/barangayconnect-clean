@@ -1,9 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import * as CryptoJS from 'crypto-js';
 import { Storage } from '@ionic/storage-angular';
-
+import { lastValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,11 @@ export class RegistrationService {
   private dbInstance: SQLiteObject | null = null;
   private currentUser: any;
 
-  constructor(private sqlite: SQLite, private platform: Platform,  private storage: Storage) {
+   // Replace with your FastAPI EC2 endpoint
+  private apiUrl = 'http://3.106.132.173:8000/api/registrations';
+
+
+  constructor(private sqlite: SQLite, private platform: Platform,  private storage: Storage, private http: HttpClient) {
     this.initDatabase();
   }
 
@@ -55,6 +60,24 @@ export class RegistrationService {
       );
     } catch (error) {
       console.error('SQLite init error:', error);
+    }
+  }
+  
+  async saveOnlineRegistration(data: any): Promise<void> {
+    try {
+      // Encrypt password before sending
+      const hashedPassword = CryptoJS.SHA256(data.password).toString();
+
+      const payload = {
+        ...data,
+        password: hashedPassword,
+        role: data.role || 'resident'
+      };
+
+      const response = await lastValueFrom(this.http.post(this.apiUrl, payload));
+      console.log('✅ Online registration success:', response);
+    } catch (error) {
+      console.error('❌ Online registration failed:', error);
     }
   }
 

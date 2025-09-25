@@ -5,13 +5,14 @@ import { ToastController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-registration',
   templateUrl: './registration.page.html',
   styleUrls: ['./registration.page.scss'],
   standalone: true,
-  imports: [IonicModule, FormsModule, CommonModule]
+  imports: [IonicModule, FormsModule, CommonModule, HttpClientModule]
 })
 export class RegistrationPage implements OnInit {
   [key: string]: any;
@@ -60,7 +61,8 @@ export class RegistrationPage implements OnInit {
   constructor(
     private registrationService: RegistrationService,
     private router: Router,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private http: HttpClient // 🔹 added
   ) {}
 
   ngOnInit() {

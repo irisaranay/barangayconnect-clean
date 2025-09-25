@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
 import { IonicModule, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { IndexedDBService } from 'src/app/services/indexed-db.service'; // make sure correct path
-
+import { IndexedDBService } from 'src/app/services/indexed-db.service'; // ✅ make sure correct path
 
 Chart.register(...registerables);
 
@@ -14,7 +13,7 @@ Chart.register(...registerables);
   templateUrl: './secretary-dashboard.page.html',
   styleUrls: ['./secretary-dashboard.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, DatePipe]
 })
 export class SecretaryDashboardPage implements OnInit, OnDestroy {
 
@@ -26,11 +25,15 @@ export class SecretaryDashboardPage implements OnInit, OnDestroy {
   pendingRequests: number = 0;
   completedRequests: number = 0;
 
-  selectedFilter: string = 'thisMonth'; // 🔹 Filter state
-  requestData: any[] = [];
-  filteredData: any[] = []; // 🔹 Holds filtered data
+  today: Date = new Date();           // Real-time date/time
+  filterSearch: string = '';          // Search input
+  private intervalId: any;
 
-  currentDate: Date = new Date(); 
+  isSidebarCollapsed = false;         // Sidebar state
+
+  requestData: any[] = [];
+  filteredData: any[] = [];           // ✅ Added to hold filtered data
+  selectedFilter: string = 'all';     // ✅ Added default filter
 
   constructor(
     private router: Router,
@@ -39,8 +42,13 @@ export class SecretaryDashboardPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loadDashboardCounts();
+    // Update the date/time every second
+    this.intervalId = setInterval(() => {
+      this.today = new Date();
+    }, 1000);
 
+    // Load data from DB
+    this.loadDashboardCounts();
 
     // Sample request data with timestamps
     this.requestData = [
@@ -53,31 +61,46 @@ export class SecretaryDashboardPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Clear interval to prevent memory leaks
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
     if (this.chart) {
       this.chart.destroy();
     }
   }
 
- async loadDashboardCounts() {
-  const allRequests = await this.indexedDbService.getAllRequests();
-  const pending = await this.indexedDbService.getRequestsByStatus('Pending');
-  const completed = await this.indexedDbService.getRequestsByStatus('Completed');
-  const today = await this.indexedDbService.getRequestsToday();
+  toggleSidebar() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    const container = document.querySelector('.container');
+    if (this.isSidebarCollapsed) {
+      container?.classList.add('sidebar-collapsed');
+      document.querySelector('.sidebar')?.classList.add('collapsed');
+    } else {
+      container?.classList.remove('sidebar-collapsed');
+      document.querySelector('.sidebar')?.classList.remove('collapsed');
+    }
+  }
 
-  this.requestCount = allRequests.length;
-  this.approvedCount = completed.length;
-  this.rejectedCount = allRequests.filter(r => r.status === 'Rejected').length;
+  async loadDashboardCounts() {
+    const allRequests = await this.indexedDbService.getAllRequests();
+    const pending = await this.indexedDbService.getRequestsByStatus('Pending');
+    const completed = await this.indexedDbService.getRequestsByStatus('Completed');
 
-  this.totalRequests = allRequests.length;
-  this.pendingRequests = pending.length;
-  this.completedRequests = completed.length;
+    this.requestCount = allRequests.length;
+    this.approvedCount = completed.length;
+    this.rejectedCount = allRequests.filter(r => r.status === 'Rejected').length;
 
-  this.requestData = allRequests;
-  this.filterData(this.selectedFilter);
+    this.totalRequests = allRequests.length;
+    this.pendingRequests = pending.length;
+    this.completedRequests = completed.length;
 
-  this.renderChart();
-}
+    this.requestData = allRequests;
+    this.filterData(this.selectedFilter);
 
+    this.renderChart();
+  }
 
   renderChart() {
     const canvas = document.getElementById('barChart') as HTMLCanvasElement;
@@ -183,5 +206,9 @@ export class SecretaryDashboardPage implements OnInit, OnDestroy {
       return reqDate >= startDate && reqDate <= endDate;
     });
   }
+// Add this method in SecretaryDashboardPage
+goToPage(path: string) {
+  this.router.navigate([`/${path}`]);
+}
 
 }

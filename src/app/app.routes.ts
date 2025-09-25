@@ -53,5 +53,13 @@ export const routes: Routes = [
   {
     path: 'released-documents',
     loadComponent: () => import('./pages/released-documents/released-documents.page').then( m => m.ReleasedDocumentsPage)
+  },  {
+    path: 'user-request',
+    loadComponent: () => import('./user-request/user-request.page').then( m => m.UserRequestPage)
   },
+  {
+    path: 'view-details',
+    loadComponent: () => import('./view-details/view-details.page').then( m => m.ViewDetailsPage)
+  },
+
 ];

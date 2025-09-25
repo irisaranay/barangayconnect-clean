@@ -1,0 +1,76 @@
+/* Card styling */
+ion-card.details-card {
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+/* Grid layout for image + info */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  align-items: start;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+/* Resident Image */
+.resident-image img {
+  width: 100%;
+  max-width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+}
+
+/* Resident Info */
+.resident-info h1 {
+  font-size: 36px;
+  margin: 0 0 20px 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  row-gap: 12px;
+  column-gap: 15px;
+}
+
+.info-label {
+  font-weight: bold;
+  font-size: 18px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+.info-value {
+  font-size: 18px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+/* Card content */
+ion-card-content {
+  padding-top: 20px;
+  font-size: 16px;
+}
+
+/* Footer buttons */
+.footer-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.footer-buttons ion-button {
+  flex: none; /* keep buttons small */
+}

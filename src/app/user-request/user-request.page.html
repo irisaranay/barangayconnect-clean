@@ -1,0 +1,177 @@
+<ion-app>
+  <div class="container">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar">
+
+      <!-- Header -->
+      <div class="menu-header">
+        <div class="menu-header-bg"></div> <!-- blurred background -->
+        <img src="assets/barangay.png" alt="Logo" class="logo-img" />
+        <span class="logo-text">Secretary</span>
+      </div>
+
+      <!-- Menu -->
+     <nav class="menu-list">
+  <a class="menu-item" routerLink="/Admin-dashboard" routerLinkActive="active">
+    <ion-icon name="home-outline"></ion-icon>
+    <span>Admin Dashboard</span>
+  </a>
+  <a class="menu-item" routerLink="/admin-history" routerLinkActive="active">
+    <ion-icon name="time-outline"></ion-icon>
+    <span>Admin History</span>
+  </a>
+  <a class="menu-item" routerLink="/registration" routerLinkActive="active">
+    <ion-icon name="person-add-outline"></ion-icon>
+    <span>Registration</span>
+  </a>
+  <a class="menu-item" routerLink="/registration-dashboard" routerLinkActive="active">
+    <ion-icon name="grid-outline"></ion-icon>
+    <span>Registration Dashboard</span>
+  </a>
+  <a class="menu-item" routerLink="/user-request" routerLinkActive="active">
+    <ion-icon name="document-text-outline"></ion-icon>
+    <span>User Request</span>
+  </a>
+</nav>
+
+
+    </aside>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="main-content">
+
+      <!-- Top Navigation -->
+      <ion-header class="topnav">
+        <div class="topnav-left">
+          <div class="topnav-title">BARANGAY CONNECT</div>
+        </div>
+        <div class="topnav-right">
+          <span class="date-text">{{ today | date:'EEEE, MMMM d, y hh:mm:ss a' }}</span>
+          <ion-icon name="notifications-outline" size="large"></ion-icon>
+        </div>
+      </ion-header>
+
+      <!-- Main Content Area -->
+      <ion-content [fullscreen]="true" class="ion-padding">
+
+        <!-- ===================== SEARCH & FILTER ===================== -->
+        <div class="top-bar">
+          <div class="topnav-center">
+            <div class="search-container">
+              <input type="text" placeholder="Search..." [(ngModel)]="filterSearch" (input)="currentPage=0"/>
+              <span class="search-icon">🔍</span>
+            </div>
+          </div>
+
+          <div class="top-bar-line line-2">
+            <div class="filter-section">
+              <label>Status :</label>
+              <select [(ngModel)]="filterStatus" (change)="currentPage=0">
+                <option value="all">All</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+                <option value="Expired">Expired</option>
+                <option value="Approved">Approved</option>
+                <option value="For Pickup">For Pickup</option>
+                <option value="Pending-Incomplete">Pending-Incomplete</option>
+              </select>
+            </div>
+
+            <div class="filter-section">
+              <label>Type :</label>
+              <select [(ngModel)]="filterType" (change)="currentPage=0">
+                <option value="all">All</option>
+                <option value="Indigency">Indigency</option>
+                <option value="Residency">Residency</option>
+              </select>
+            </div>
+
+            <div class="filter-section">
+              <label>Date :</label>
+              <input type="date" [(ngModel)]="filterDateFrom" (change)="currentPage=0">
+              <span>to</span>
+              <input type="date" [(ngModel)]="filterDateTo" (change)="currentPage=0">
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== TABLE ===================== -->
+        <div class="table-container">
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Resident Name</th>
+                <th>Document</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of pagedRequests">
+                <td>{{ request.date | date:'MMM dd, EEEE, y' }}</td>
+                <td>{{ request.resident }}</td>
+                <td>{{ request.document }}</td>
+                <td>
+                  <span [ngClass]="{
+                    'status-completed': request.status === 'Completed',
+                    'status-pending': request.status === 'Pending',
+                    'status-incomplete': request.status === 'Pending-Incomplete',
+                    'status-pickup': request.status === 'For Pickup',
+                    'status-expired': request.status === 'Expired',
+                    'status-approved': request.status === 'Approved'
+                  }">{{ request.status }}</span>
+                </td>
+                <td>
+                  <button class="status-btn completed" *ngIf="request.status==='Completed'" (click)="openDetails(request, 'closeOnly')">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    View Details
+                  </button>
+                  <button class="status-btn incomplete" *ngIf="request.status==='Pending-Incomplete'" (click)="openDetails(request, 'deleteCancel')">
+                    <ion-icon name="alert-circle-outline"></ion-icon>
+                    Request Update
+                  </button>
+                  <button class="status-btn pickup" *ngIf="request.status==='For Pickup'" (click)="openDetails(request, 'closeOnly')">
+                    <ion-icon name="cube-outline"></ion-icon>
+                    Mark as Released
+                  </button>
+                  <button class="status-btn expired" *ngIf="request.status==='Expired'" (click)="openDetails(request, 'deleteCancel')">
+                    <ion-icon name="close-circle-outline"></ion-icon>
+                    View Record
+                  </button>
+                  <button class="status-btn pending" *ngIf="request.status==='Pending'" (click)="openDetails(request, 'closeOnly')">
+                    <ion-icon name="time-outline"></ion-icon>
+                    Review
+                  </button>
+                  <button class="status-btn approved" *ngIf="request.status==='Approved'" (click)="openDetails(request, 'print')">
+                    <ion-icon name="print-outline"></ion-icon>
+                    For Print
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ===================== PAGINATION ===================== -->
+        <div class="pagination">
+          <div class="pagination-left">
+            <span>{{ filteredRequests.length }} items</span>
+          </div>
+
+          <div class="pagination-right">
+            <span>Rows per Page:</span>
+            <select [(ngModel)]="rowsPerPage" (change)="updatePagination()">
+              <option *ngFor="let option of rowsOptions" [value]="option">{{ option }}</option>
+            </select>
+            <span>{{ startItem + 1 }}–{{ endItem }} of {{ filteredRequests.length }}</span>
+            <ion-icon name="chevron-back-outline" (click)="prevPage()"></ion-icon>
+            <ion-icon name="chevron-forward-outline" (click)="nextPage()"></ion-icon>
+          </div>
+        </div>
+
+      </ion-content>
+    </main>
+  </div>
+</ion-app>

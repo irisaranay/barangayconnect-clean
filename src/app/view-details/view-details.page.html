@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Request Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card class="details-card">
+    <div class="grid-container">
+      <!-- Resident Image -->
+      <div class="resident-image">
+        <img src="assets/pic.webp" alt="Resident Photo">
+      </div>
+
+      <!-- Resident Info -->
+      <div class="resident-info">
+        <h1>{{ request.resident }}</h1>
+        <div class="info-grid">
+          <div class="info-label">Status:</div>
+          <div class="info-value" [style.color]="getStatusColor(request.status)">
+            {{ request.status }}
+          </div>
+
+          <div class="info-label">Document:</div>
+          <div class="info-value">{{ request.document }}</div>
+
+          <div class="info-label">Date:</div>
+          <div class="info-value">{{ request.date | date:'MMM dd, y, h:mm a' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <ion-card-content>
+      <p>Additional details can go here if needed.</p>
+    </ion-card-content>
+
+    <!-- Footer Buttons based on modalType -->
+    <ion-card-footer>
+      <div class="footer-buttons">
+        <!-- Close Only -->
+        <ion-button *ngIf="modalType === 'closeOnly'" size="small" color="medium" (click)="closeModal()">
+          Close
+        </ion-button>
+
+        <!-- Delete + Cancel -->
+        <ng-container *ngIf="modalType === 'deleteCancel'">
+          <ion-button size="small" color="danger" (click)="deleteRequest()">Delete</ion-button>
+          <ion-button size="small" color="medium" (click)="closeModal()">Cancel</ion-button>
+        </ng-container>
+
+        <!-- Print + Cancel -->
+        <ng-container *ngIf="modalType === 'print'">
+          <ion-button size="small" color="primary" (click)="printRequest()">Print</ion-button>
+          <ion-button size="small" color="medium" (click)="closeModal()">Cancel</ion-button>
+        </ng-container>
+      </div>
+    </ion-card-footer>
+  </ion-card>
+</ion-content>
